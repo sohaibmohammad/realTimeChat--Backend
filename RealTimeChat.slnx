@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Chat.Business/Chat.Business.csproj" Id="5cf25532-2a9f-45a7-9857-2b4e112f6328" />
+  <Project Path="Chat.Infrastructure/Chat.Infrastructure.csproj" Id="b0dd34ee-51c9-4ab5-939c-01a199f4a8cc" />
+  <Project Path="Chat.Test/Chat.Test.csproj" Id="d337a6fb-faf7-4058-b211-9139a5f644bb" />
+  <Project Path="ChatDomain/Chat.Domain.csproj" Id="e8f03462-cece-4ae6-9f5d-db670122b290" />
+  <Project Path="RealTimeChat/RealTimeChat.csproj" />
+</Solution>
