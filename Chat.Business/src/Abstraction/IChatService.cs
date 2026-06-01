@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chat.Business.src.Dto.Message.Create;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Chat.Business.src.Abstraction
 {
 	public interface IChatService
 	{
-		Task<>
+		Task<MessageDto> SendMessageAsync(CreateMessageRequest request);
 	}
 }

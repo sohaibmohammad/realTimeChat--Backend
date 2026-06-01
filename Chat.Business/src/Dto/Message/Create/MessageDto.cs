@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chat.Business.src.Dto
+namespace Chat.Business.src.Dto.Message.Create
 {
 	public record MessageDto(Guid Id, Guid SenderId, Guid ConversationId, string MessageText, DateTime CreatedAt,string Status);
 	

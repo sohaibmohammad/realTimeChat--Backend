@@ -28,5 +28,19 @@ namespace Chat.Infrastructure.src.Repository
 				.OrderByDescending(c => c.CreatedAt)
 				.ToListAsync();
 		}
+		public async Task<Guid> GetConversationBetweenUsersAsync(Guid senderId, Guid receiverId)
+		{
+			var conversationId = await _context.Participants
+ 				.Where(p => p.UserId == senderId || p.UserId == receiverId)
+
+ 				.GroupBy(p => p.ConversationId) 
+				.Where(g => g.Count() == 2)
+
+ 				.Select(g => g.Key)
+
+ 				.FirstOrDefaultAsync();
+
+			return conversationId;
+		}
 	}
 }

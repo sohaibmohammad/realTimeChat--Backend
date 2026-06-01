@@ -26,4 +26,4 @@ namespace Chat.Infrastructure.src.Repository
 				.ToListAsync();
 		}
 	}
-}
+	}

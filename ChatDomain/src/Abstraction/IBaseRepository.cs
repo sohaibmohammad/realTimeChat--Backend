@@ -25,9 +25,4 @@ namespace Chat.Domain.src.Abstraction
 		Task GetCountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
 
 	}
-	public interface IMessageRepository : IBaseRepository<Message>
-	{
-		// دالة بتجيب رسائل محادثة معينة مرتبة من الأقدم للأحدث (عشان تظهر صح بالشات)
-		Task<IEnumerable<Message>> GetMessagesByConversationIdAsync(Guid conversationId, int pageSize = 50);
-	}
 }
