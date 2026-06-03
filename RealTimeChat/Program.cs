@@ -1,10 +1,14 @@
 ﻿using Chat.Business.src.Abstraction;
 using Chat.Business.src.Hubs;
 using Chat.Business.src.Implementation;
-using Chat.Domain.src.Abstraction;
+using Chat.Business.src.Managers;
+ using Chat.Domain.src.Abstraction;
 using Chat.Infrastructure.src.Database;
 using Chat.Infrastructure.src.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +18,43 @@ builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<ChatHub>();
-builder.Services.AddScoped<IParticipantRepository,ParticipantRepository>(); 
-
+builder.Services.AddScoped<IParticipantRepository,ParticipantRepository>();
+builder.Services.AddScoped<JwtManager>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();	
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		var jwtSection = builder.Configuration.GetSection("JwtOptions");
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = jwtSection["Issuer"],
+			ValidAudience = jwtSection["Audience"],
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Encoding.UTF8.GetBytes(jwtSection["SecretKey"])
+				)
+		};
+		options.Events = new JwtBearerEvents
+		{
+			OnAuthenticationFailed = context =>
+			{
+				Console.WriteLine("Jwt Auth Failed" + context.Exception.Message);
+				return Task.CompletedTask;
+			}
+		};
+	});
+
 
 // 🔥 [تعديل 1]: تسجيل سياسة الـ CORS وبنائها (ضروري جداً عشان الـ React والـ SignalR)
 builder.Services.AddCors(options =>

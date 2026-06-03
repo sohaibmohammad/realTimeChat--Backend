@@ -15,7 +15,7 @@ namespace Chat.Business.src.Implementation
 	public class ChatService : IChatService
 	{
 		private readonly IMessageRepository _messageRepository;
-		private readonly IConversationRepository _conversationRepository; // تأكد من أسماء الـ Repositories عندك
+		private readonly IConversationRepository _conversationRepository; 
  		private readonly IHubContext<ChatHub> _hubContext;
 		private readonly IParticipantRepository _participantRepository;
 		public ChatService(IParticipantRepository participantRepository ,IConversationRepository conversationRepository, IMessageRepository messageRepository, IHubContext<ChatHub> hubContext)

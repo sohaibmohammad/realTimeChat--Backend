@@ -10,6 +10,7 @@ namespace Chat.Infrastructure.src.Database
 		public DbSet<Conversation> Conversations { get; set; }
 		public DbSet<Participant> Participants { get; set; }
 
+		public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
 		}

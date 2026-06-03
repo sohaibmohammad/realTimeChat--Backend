@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Chat.Infrastructure.src.Repository
-{
+{ 
 	public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : SharedEntity
 	{
 
