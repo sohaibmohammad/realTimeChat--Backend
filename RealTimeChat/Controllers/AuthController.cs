@@ -19,7 +19,7 @@ namespace RealTimeChat.Controllers
 
 			return Ok(new { AccessToken = result.AccessToken, RefreshToken = result.RefreshToken });
 		}
-
+		
 
 		[HttpPost("Regester")]
 		public async Task<IActionResult> CreateAccount(CreateUserRequests requests)
