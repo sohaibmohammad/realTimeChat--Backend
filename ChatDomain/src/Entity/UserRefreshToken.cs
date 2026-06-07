@@ -1,5 +1,8 @@
-﻿namespace Chat.Domain.src.Entity
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Chat.Domain.src.Entity
 {
+	[Table("UserRefreshToken")]
 	public class UserRefreshToken
 	{
 		public Guid Id { get; set; }

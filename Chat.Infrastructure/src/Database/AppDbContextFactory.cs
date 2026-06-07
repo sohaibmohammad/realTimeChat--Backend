@@ -14,7 +14,7 @@ namespace Chat.Infrastructure.src.Database
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 			// حط هون نفس الكونكشن سترينج تبعك للتجربة فقط
-			optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=RealTimeChat;Trusted_Connection=True;TrustServerCertificate=True");
+			optionsBuilder.UseSqlServer("Server=localhost,1434;Database=RealTimeChat;User Id=sa;Password=SohaibSqlPass2026;TrustServerCertificate=True;");
 
 			return new AppDbContext(optionsBuilder.Options);
 		}

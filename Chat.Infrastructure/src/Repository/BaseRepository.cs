@@ -2,6 +2,7 @@
 using Chat.Domain.src.Entity;
 using Chat.Infrastructure.src.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Chat.Infrastructure.src.Repository
 { 
-	public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : SharedEntity
+	public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
 	{
 
 		private readonly AppDbContext _context;
@@ -26,6 +27,9 @@ namespace Chat.Infrastructure.src.Repository
 			_dbSet = _context.Set<TEntity>();
 			_logger = logger;
 		}
+
+	
+
 		public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
 		{
 			try
@@ -99,6 +103,14 @@ namespace Chat.Infrastructure.src.Repository
 			{
 				throw new Exception("Error in update data");
 			}
+		}
+		public async Task<IDbContextTransaction> BeginTransactionAsync()
+		{
+			return await _context.Database.BeginTransactionAsync();
+		}
+		public void Dispose()
+		{
+			_context.Dispose();
 		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chat.Business.src.Dto.Message.Create
 {
-	 public record CreateMessageRequest(Guid SenderId, Guid receiverId, string Content);
+	 public record CreateMessageRequest(Guid SenderId, Guid ConversationId, string Content);
 	
 	
 }

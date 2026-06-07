@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Chat.Domain.src.Abstraction
 {
-	public interface IBaseRepository<TEntity> where TEntity : SharedEntity
+	public interface IBaseRepository<TEntity> : IDisposable
 	{
 		IQueryable<TEntity> Query(bool includeDeleted = false);
 
@@ -23,6 +23,7 @@ namespace Chat.Domain.src.Abstraction
 		Task SaveChangesAsync(CancellationToken cancellationToken = default);
 		Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
 		Task GetCountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default);
-
+		Task<Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction> BeginTransactionAsync();
+		void Dispose();
 	}
 }
