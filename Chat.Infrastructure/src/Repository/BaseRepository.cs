@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Chat.Infrastructure.src.Repository
 { 
-	public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
+	public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : SharedEntity
 	{
 
 		private readonly AppDbContext _context;
@@ -104,13 +104,7 @@ namespace Chat.Infrastructure.src.Repository
 				throw new Exception("Error in update data");
 			}
 		}
-		public async Task<IDbContextTransaction> BeginTransactionAsync()
-		{
-			return await _context.Database.BeginTransactionAsync();
-		}
-		public void Dispose()
-		{
-			_context.Dispose();
-		}
+	 
+		 
 	}
 }
