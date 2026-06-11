@@ -1,5 +1,6 @@
 ﻿using Chat.Business.src.Abstraction;
 using Chat.Business.src.Dto.Converstion;
+using Chat.Business.src.Dto.Message.Get;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
 using System;
@@ -13,12 +14,15 @@ namespace Chat.Business.src.Implementation
 	public class ConversationService:IConversationService
 	{
 		private readonly IConversationRepository _conversationRepository;
+		private readonly IMessageRepository _messageRepository;	
 		private readonly IParticipantRepository _participantRepository;
-
-		public ConversationService(IConversationRepository conversationRepository, IParticipantRepository participantRepository	)
+		private readonly IUserRepository _userRepository;
+		public ConversationService(IUserRepository userRepository,IMessageRepository messageRepository,IConversationRepository conversationRepository, IParticipantRepository participantRepository	)
 		{
 			_conversationRepository = conversationRepository;
 			_participantRepository = participantRepository;
+			_messageRepository = messageRepository;
+			_userRepository = userRepository;
 		}
 
 		public async Task<Guid> CreateConversationAsync(ConversationCreate request)
@@ -28,7 +32,7 @@ namespace Chat.Business.src.Implementation
 				var existingId = await _conversationRepository.GetConversationBetweenUsersAsync(request.participantIds[0], request.participantIds[1]);
 				if (existingId != Guid.Empty)
 				{
-					return existingId; // الغرفة موجودة أصلاً، برجع الـ ID تبعها فوراً بدون تكرار
+					return existingId; 
 				}
 			}
 			var newConversation = new Conversation
@@ -54,5 +58,27 @@ namespace Chat.Business.src.Implementation
 			await _conversationRepository.SaveChangesAsync();
 			return newConversation.id;
 		}
+
+	    public async Task <List<ConversationGetAll>> GetAllChats(Guid userId)
+		{
+			var user= await _userRepository.GetByIdAsync(userId);
+			if (user == null)
+				throw new Exception("Please Login");
+
+			var conversations = await _conversationRepository.GetConversationsForUserAsync(userId);
+			var conversationsList = conversations
+				.Select(x => new ConversationGetAll(
+             	x.id,
+		 		x.GroupName,
+		 		x.Messages != null && x.Messages.Any()
+		 		? x.Messages.OrderByDescending(c => c.CreatedAt).FirstOrDefault().MessageText // 👈 هون حط اسم حقل النص عندك (Content أو Text)
+		 		: string.Empty 
+		 	)).ToList();
+
+			return conversationsList;
+
+			
+		}
+
 	}
 }

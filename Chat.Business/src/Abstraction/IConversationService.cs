@@ -10,6 +10,6 @@ namespace Chat.Business.src.Abstraction
 	public interface IConversationService
 	{
 		Task<Guid> CreateConversationAsync(ConversationCreate request);
-
+		Task<List<ConversationGetAll>> GetAllChats(Guid userId);
 	}
 }

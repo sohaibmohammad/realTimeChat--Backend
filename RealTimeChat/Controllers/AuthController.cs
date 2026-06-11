@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace RealTimeChat.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]")]
+	[Route("api/v1/[controller]")]
 	public class AuthController(IAuthService _authService, IUserRepository _userRepository, JwtManager _jwtManager) : ControllerBase
 	{
 		[HttpPost("login")]

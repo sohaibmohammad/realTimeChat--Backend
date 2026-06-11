@@ -49,7 +49,7 @@ namespace Chat.Infrastructure.src.Repository
 			throw new NotImplementedException();
 		}
 
-		public async Task DeleteAsync(TEntity entity)
+		public  async Task<bool> DeleteAsync(TEntity entity)
 		{
 		var isSoftDelete=typeof(TEntity).GetProperty("IsDeleted")!=null;
 			if (isSoftDelete)
@@ -61,6 +61,7 @@ namespace Chat.Infrastructure.src.Repository
 			{
 				_dbSet.Remove(entity);
 			}
+			return true;
 		}
 
 		public async Task<TEntity?> GetByIdAsync(Guid Id, CancellationToken cancellationToken = default)

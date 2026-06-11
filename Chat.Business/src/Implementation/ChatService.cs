@@ -1,6 +1,7 @@
 ﻿using Chat.Business.src.Abstraction;
 using Chat.Business.src.Dto.Converstion;
 using Chat.Business.src.Dto.Message.Create;
+using Chat.Business.src.Dto.Message.Get;
 using Chat.Business.src.Hubs;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
@@ -28,9 +29,22 @@ namespace Chat.Business.src.Implementation
 			_participantRepository = participantRepository;
 		}
 
-		public Task<bool> DeleteMessageAsync(Guid messageId, Guid userId)
+		public async Task<bool> DeleteMessageAsync(Guid messageId, Guid userId)
 		{
-			throw new NotImplementedException();
+
+
+			var message = await _messageRepository.GetByIdAsync(messageId);
+			if (message == null || message.SenderId != userId) {
+				return false;
+			}
+			var delete= await _messageRepository.DeleteAsync(message);
+			await _hubContext.Clients
+	.Group(message.ConversationId.ToString())
+	.SendAsync("MessageDeleted", messageId);
+			await _messageRepository.SaveChangesAsync();
+
+			return delete;
+			
 		}
 
 		public Task<IEnumerable<MessageDto>> GetMessagesByConversationIdAsync(CoversationRequest request)
@@ -81,6 +95,32 @@ namespace Chat.Business.src.Implementation
 			return messageDto;
 		}
 
-	
+		public async Task<PagedMessagesResult> GetMessagesAsync(Guid currentUserId,GetMessageRequest request)
+		{
+
+			var messages=await _messageRepository.GetMessagesByConversationIdAsync(request.ConversationId,request.Cursor,request.Limit);
+
+			var hasMore = messages.Count() > request.Limit ;
+
+			if(hasMore)
+				messages = messages.Take(request.Limit).ToList() ;
+			var result = messages
+		  .OrderBy(m => m.CreatedAt)
+		  .Select(m => new GetMessage
+		  {
+			  Id = m.id,
+			  SenderId = m.SenderId,
+			  Text = m.MessageText,
+			  CreatedAt = m.CreatedAt,
+
+			  IsMine=m.SenderId == currentUserId,
+		  })
+		  .ToList();
+			return new PagedMessagesResult
+			{
+				Messages = result,
+				HasMore = hasMore
+			};
+		}
 	}
 }

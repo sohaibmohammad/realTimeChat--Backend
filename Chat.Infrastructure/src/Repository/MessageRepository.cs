@@ -3,6 +3,7 @@ using Chat.Domain.src.Entity;
 using Chat.Infrastructure.src.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Chat.Infrastructure.src.Repository
 {
@@ -17,13 +18,24 @@ namespace Chat.Infrastructure.src.Repository
 			_dbSet = _context.Set<Message>();
 			_logger = logger;
 		}
-		public async Task<IEnumerable<Message>> GetMessagesByConversationIdAsync(Guid conversationId, int pageSize = 50)
+		public async Task<IEnumerable<Message>> GetMessagesByConversationIdAsync(Guid conversationId, Guid? cursor, int limit = 10)
 		{
-			return await _context.Messages
-				.Where(m => m.ConversationId == conversationId)
-				.OrderBy(m => m.CreatedAt)
-				.Take(pageSize)
-				.ToListAsync();
+			var query = _context.Messages.Where(m => m.ConversationId == conversationId);
+
+			if (cursor.HasValue)
+			{
+				var cursorMessage = await _context.Messages.FirstOrDefaultAsync(m => m.id == cursor.Value);
+
+				if (cursorMessage != null)
+				{
+					query = query.Where(m => m.CreatedAt < cursorMessage.CreatedAt);
+				}
+
+			}
+			return await query
+		   .OrderByDescending(m => m.CreatedAt)
+		   .Take(limit + 1)
+		   .ToListAsync();
 		}
 	}
 	}

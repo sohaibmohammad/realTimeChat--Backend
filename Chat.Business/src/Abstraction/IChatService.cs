@@ -1,5 +1,6 @@
 ﻿using Chat.Business.src.Dto.Converstion;
 using Chat.Business.src.Dto.Message.Create;
+using Chat.Business.src.Dto.Message.Get;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,6 @@ namespace Chat.Business.src.Abstraction
 
 		// 6. مسح رسالة (حذف من الطرفين أو طرف واحد حسب البزنس)
 		Task<bool> DeleteMessageAsync(Guid messageId, Guid userId);
+		Task<PagedMessagesResult> GetMessagesAsync(Guid currentUserId, GetMessageRequest request);
 	}
 }
