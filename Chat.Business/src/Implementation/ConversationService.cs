@@ -69,7 +69,7 @@ namespace Chat.Business.src.Implementation
 			var conversationsList = conversations
 				.Select(x => new ConversationGetAll(
              	x.id,
-		 		x.GroupName,
+		 		x.IsGroup&&x.GroupName!= "Direct Chat"?x.GroupName:x.Participants.Where(p=>p.UserId!=userId).Select(p=>p.User?.UserName).FirstOrDefault()??"Unknow User",
 		 		x.Messages != null && x.Messages.Any()
 		 		? x.Messages.OrderByDescending(c => c.CreatedAt).FirstOrDefault().MessageText // 👈 هون حط اسم حقل النص عندك (Content أو Text)
 		 		: string.Empty 

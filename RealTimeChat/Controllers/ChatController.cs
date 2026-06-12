@@ -44,8 +44,8 @@ namespace RealTimeChat.Controllers
 			return Ok(result);
 		}
 		[Authorize]
-		[HttpGet("/messages")]
-		public async Task<IActionResult> GetMessages(GetMessageRequest request)
+		[HttpGet("messages")]
+		public async Task<IActionResult> GetMessages([FromQuery]GetMessageRequest request)
 		{
 			var userIdClaim=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			if (string.IsNullOrEmpty(userIdClaim))

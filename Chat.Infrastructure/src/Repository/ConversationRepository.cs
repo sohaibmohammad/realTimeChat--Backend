@@ -21,7 +21,7 @@ namespace Chat.Infrastructure.src.Repository
 		public async Task<IEnumerable<Conversation>> GetConversationsForUserAsync(Guid userId)
 		{
 			return await _context.Conversations
-		.Include(c => c.Participants)
+		.Include(c => c.Participants).ThenInclude(c=>c.User)
 			
 		// شلنا الـ Include تبع الـ Messages من هون نهائياً لحماية الرام
 		.Where(c => c.Participants.Any(p => p.UserId == userId))

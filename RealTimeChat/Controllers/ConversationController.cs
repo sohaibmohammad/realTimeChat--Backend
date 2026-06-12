@@ -1,6 +1,6 @@
 ﻿using Chat.Business.src.Abstraction;
 using Chat.Business.src.Dto.Converstion;
-using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using System.Security.Claims;
