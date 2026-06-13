@@ -17,7 +17,6 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<ChatHub>();
 builder.Services.AddScoped<IParticipantRepository,ParticipantRepository>();
 builder.Services.AddScoped<JwtManager>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -53,6 +52,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			OnAuthenticationFailed = context =>
 			{
 				Console.WriteLine("Jwt Auth Failed" + context.Exception.Message);
+				return Task.CompletedTask;
+			},
+			OnMessageReceived = context =>
+			{
+				var accessToken = context.Request.Query["access_token"];
+
+				var path = context.HttpContext.Request.Path;
+				if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/chathub"))
+				{
+					context.Token = accessToken;
+				}
 				return Task.CompletedTask;
 			}
 		};

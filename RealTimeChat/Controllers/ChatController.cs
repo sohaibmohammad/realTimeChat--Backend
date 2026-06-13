@@ -20,9 +20,14 @@ namespace RealTimeChat.Controllers
 		}
 
 		[HttpPost("send")]
+		[Authorize]
 		public async Task<IActionResult> SendMessage([FromBody] CreateMessageRequest request)
 		{
-			var result = await _chatService.SendMessageAsync(request);
+			var user=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			var sender = Guid.Parse(user);
+			var result = await _chatService.SendMessageAsync(sender,request);
+			
+
 			return Ok(result);
 		}
 
