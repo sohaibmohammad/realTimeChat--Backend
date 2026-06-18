@@ -67,12 +67,12 @@ namespace Chat.Business.src.Implementation
 			throw new NotImplementedException();
 		}
 
-		public async Task<MessageDto> SendMessageAsync(CreateMessageRequest request)
+		public async Task<MessageDto> SendMessageAsync(Guid sender,CreateMessageRequest request)
 		{
 			var message = new Message
 			{
 				id = Guid.NewGuid(),
-				SenderId = request.SenderId,
+				SenderId = sender,
 				ConversationId = request.ConversationId,
 				MessageText = request.Content,
 				CreatedAt = DateTime.UtcNow,

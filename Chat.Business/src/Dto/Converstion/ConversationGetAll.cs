@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Chat.Business.src.Dto.Converstion;
 
-	public record ConversationGetAll(Guid Id , string GroupName ,string? LastMessage);
+	public record ConversationGetAll(Guid Id , string ?GroupName ,string? LastMessage);
 	

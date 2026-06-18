@@ -3,6 +3,7 @@ using Chat.Business.src.Dto.Converstion;
 using Chat.Business.src.Dto.Message.Get;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,25 +60,36 @@ namespace Chat.Business.src.Implementation
 			return newConversation.id;
 		}
 
-	    public async Task <List<ConversationGetAll>> GetAllChats(Guid userId)
+		public async Task<List<ConversationGetAll>> GetAllChats(Guid userId)
 		{
-			var user= await _userRepository.GetByIdAsync(userId);
+			var user = await _userRepository.GetByIdAsync(userId);
+
 			if (user == null)
 				throw new Exception("Please Login");
 
 			var conversations = await _conversationRepository.GetConversationsForUserAsync(userId);
-			var conversationsList = conversations
-				.Select(x => new ConversationGetAll(
-             	x.id,
-		 		x.IsGroup&&x.GroupName!= "Direct Chat"?x.GroupName:x.Participants.Where(p=>p.UserId!=userId).Select(p=>p.User?.UserName).FirstOrDefault()??"Unknow User",
-		 		x.Messages != null && x.Messages.Any()
-		 		? x.Messages.OrderByDescending(c => c.CreatedAt).FirstOrDefault().MessageText // 👈 هون حط اسم حقل النص عندك (Content أو Text)
-		 		: string.Empty 
-		 	)).ToList();
+
+			var conversationsList = conversations.Select(x =>
+			{
+				var lastMessage = x.Messages?
+					.OrderByDescending(m => m.CreatedAt)
+					.FirstOrDefault();
+
+				return new ConversationGetAll(
+					x.id,
+
+					x.IsGroup && x.GroupName != "Direct Chat"
+						? x.GroupName
+						: x.Participants
+							.Where(p => p.UserId != userId)
+							.Select(p => p.User?.UserName)
+							.FirstOrDefault() ?? "Unknown User",
+
+					lastMessage?.MessageText ?? string.Empty
+				);
+			}).ToList();
 
 			return conversationsList;
-
-			
 		}
 
 	}

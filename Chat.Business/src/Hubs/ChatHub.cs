@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Chat.Business.src.Hubs
 {
-	[Authorize]
+	//[Authorize]
 	public class ChatHub : Hub
 	{
 		// ميثود يدخل فيها المستخدم لغرفة المحادثة الخاصة بالـ ConversationId
@@ -24,6 +24,11 @@ namespace Chat.Business.src.Hubs
 		{
 			// استخدام الميثود المباشرة الصحيحة
 			await Groups.RemoveFromGroupAsync(Context.ConnectionId, conversationId);
+		}
+
+		public Task SendTypingStatus(string conversationId,bool isTyping)
+		{
+			return Clients.OthersInGroup(conversationId).SendAsync("ReceiveTypingStatus", Context.ConnectionId, isTyping);
 		}
 	}
 }

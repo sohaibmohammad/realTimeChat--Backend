@@ -11,7 +11,7 @@ namespace Chat.Business.src.Abstraction
 {
 	public interface IChatService
 	{
-		Task<MessageDto> SendMessageAsync(CreateMessageRequest request);
+		Task<MessageDto> SendMessageAsync(Guid sender,CreateMessageRequest request);
 
 		Task<IEnumerable<MessageDto>> GetMessagesByConversationIdAsync(CoversationRequest request);
 
