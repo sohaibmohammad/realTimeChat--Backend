@@ -3,6 +3,8 @@ using Chat.Business.src.Dto.Converstion;
 using Chat.Business.src.Dto.Message.Create;
 using Chat.Business.src.Dto.Message.Delete;
 using Chat.Business.src.Dto.Message.Get;
+using Chat.Business.src.Handler;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,9 +16,11 @@ namespace RealTimeChat.Controllers
 	public class ChatController:ControllerBase
 	{
 		private readonly IChatService _chatService;
-		public ChatController(IChatService chatService)
+		private readonly IMediator _mediator;
+		public ChatController(IChatService chatService, IMediator mediator)
 		{
 			_chatService = chatService;
+			_mediator = mediator;
 		}
 
 		[HttpPost("send")]
@@ -25,7 +29,8 @@ namespace RealTimeChat.Controllers
 		{
 			var user=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			var sender = Guid.Parse(user);
-			var result = await _chatService.SendMessageAsync(sender,request);
+			var command = new SendMessageCommand(request, sender);
+			var result = await _mediator.Send(command);
 			
 
 			return Ok(result);

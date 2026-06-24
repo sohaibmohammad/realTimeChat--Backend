@@ -2,12 +2,15 @@
 using Chat.Business.src.Hubs;
 using Chat.Business.src.Implementation;
 using Chat.Business.src.Managers;
- using Chat.Domain.src.Abstraction;
+using Chat.Business.src.Messages.Commands;
+using Chat.Domain.src.Abstraction;
 using Chat.Infrastructure.src.Database;
 using Chat.Infrastructure.src.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +28,15 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConversationService,ConversationService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IChatNotifier, ChatNotifier>();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddSwaggerGen();
 
 
+builder.Services.AddMediatR(cfg => {
+	cfg.RegisterServicesFromAssembly(typeof(SendMessageCommandHandler).Assembly);
+});
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -101,8 +109,8 @@ app.UseHttpsRedirection();
 // 🔥 [تعديل 2]: ترتيب الـ Middleware الصحيح
 app.UseCors("AllowReactApp"); // 1. الـ CORS أولاً
 
-app.UseAuthorization();       // 2. الـ Authorization ثانياً
-
+app.UseAuthentication();
+app.UseAuthorization();
 // 3. الـ Endpoints والمخارج أخيرًا
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
