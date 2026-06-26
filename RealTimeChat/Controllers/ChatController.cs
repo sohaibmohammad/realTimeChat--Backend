@@ -4,6 +4,7 @@ using Chat.Business.src.Dto.Message.Create;
 using Chat.Business.src.Dto.Message.Delete;
 using Chat.Business.src.Dto.Message.Get;
 using Chat.Business.src.Handler;
+using Chat.Business.src.Messages.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,8 @@ namespace RealTimeChat.Controllers
 			{
 				return BadRequest("صيغة معرف المستخدم غير صحيحة.");
 			}
-			var result = await _chatService.DeleteMessageAsync(request.MessageId,userId);
+			var command = new DeleteMessageCommand(request.MessageId, userId);
+			var result = await _mediator.Send(command);
 			return Ok(result);
 		}
 		[Authorize]
