@@ -5,6 +5,7 @@ using Chat.Business.src.Managers;
 using Chat.Business.src.Messages.Commands;
 using Chat.Domain.src.Abstraction;
 using Chat.Infrastructure.src.Database;
+using Chat.Infrastructure.src.Messaging;
 using Chat.Infrastructure.src.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IChatNotifier, ChatNotifier>();
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IMessageQueue, MessageQueue>();
 
 
 builder.Services.AddMediatR(cfg => {

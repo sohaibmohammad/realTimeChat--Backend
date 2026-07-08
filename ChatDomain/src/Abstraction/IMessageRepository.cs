@@ -6,5 +6,6 @@ namespace Chat.Domain.src.Abstraction
 	{
 		// دالة بتجيب رسائل محادثة معينة مرتبة من الأقدم للأحدث (عشان تظهر صح بالشات)
 		Task<IEnumerable<Message>> GetMessagesByConversationIdAsync(Guid conversationId, Guid? cursor, int limit = 10);
+		Task<bool> UserHasThisMessage(Guid userId, Guid messageId);
 	}
 }

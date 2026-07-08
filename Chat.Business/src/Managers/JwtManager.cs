@@ -1,7 +1,6 @@
 ﻿using Chat.Business.src.Dto.User.Get;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
-using Chat.Infrastructure.src.Database;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -19,15 +18,13 @@ namespace Chat.Business.src.Managers
 	{
 		private readonly JwtOptions _options;
 		private readonly IUserRepository _userRepository;
-		private readonly AppDbContext _dbcontext;
-		private readonly IRefreshTokenRepository _refreshTokenRepository;
+ 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-		public JwtManager(IOptions<JwtOptions> options, IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository, AppDbContext appDbContext)
+		public JwtManager(IOptions<JwtOptions> options, IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository)
 		{
 			_options = options.Value;
 			_userRepository = userRepository;
-			_dbcontext = appDbContext;
-			_refreshTokenRepository = refreshTokenRepository;
+ 			_refreshTokenRepository = refreshTokenRepository;
 		}
 
 

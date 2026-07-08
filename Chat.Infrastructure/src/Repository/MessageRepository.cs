@@ -37,5 +37,14 @@ namespace Chat.Infrastructure.src.Repository
 		   .Take(limit + 1)
 		   .ToListAsync();
 		}
+
+		public async Task<bool> UserHasThisMessage(Guid userId, Guid messageId)
+		{
+			var message = await _context.Messages.FirstOrDefaultAsync(m => m.id == messageId && m.SenderId == userId);
+			if (message == null)
+				return false;
+			var participant = await _context.Participants.FirstOrDefaultAsync(p => p.ConversationId == message.ConversationId && p.UserId == userId);
+			return participant != null;
+		}
 	}
 	}

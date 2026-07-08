@@ -5,7 +5,6 @@ using Chat.Business.src.Dto.Message.Get;
 using Chat.Business.src.Hubs;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
-using Chat.Infrastructure.src.Repository;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;

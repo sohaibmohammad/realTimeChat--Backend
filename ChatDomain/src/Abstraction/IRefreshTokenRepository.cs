@@ -17,4 +17,5 @@ namespace Chat.Domain.src.Abstraction
 		Task RevokeAsync(Guid userId);
 		Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken);
 	}
+	 
 }
