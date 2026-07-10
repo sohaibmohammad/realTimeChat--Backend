@@ -7,7 +7,9 @@ using Chat.Domain.src.Abstraction;
 using Chat.Infrastructure.src.Database;
 using Chat.Infrastructure.src.Messaging;
 using Chat.Infrastructure.src.Repository;
+using Chat.Infrastructure.src.Workers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -34,7 +36,7 @@ builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IMessageQueue, MessageQueue>();
-
+builder.Services.AddHostedService<MessageWorker>();
 
 builder.Services.AddMediatR(cfg => {
 	cfg.RegisterServicesFromAssembly(typeof(SendMessageCommandHandler).Assembly);
@@ -91,6 +93,16 @@ builder.Services.AddCors(options =>
 	});
 });
 
+builder.Services.AddRateLimiter(options => {
+	options.AddFixedWindowLimiter("MessageLimiter", limiterOptions => {
+		limiterOptions.PermitLimit = 5;
+		limiterOptions.Window = TimeSpan.FromMinutes(1);
+		limiterOptions.QueueLimit = 0;
+	});
+
+});
+
+
 // 2. تسجيل خدمات الـ SignalR
 builder.Services.AddSignalR();
 
@@ -113,6 +125,7 @@ app.UseCors("AllowReactApp"); // 1. الـ CORS أولاً
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 // 3. الـ Endpoints والمخارج أخيرًا
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");

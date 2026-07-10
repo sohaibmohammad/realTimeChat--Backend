@@ -70,6 +70,6 @@ namespace Chat.Business.src.Messages.Commands
 				messageEvent.CreatedAt,
 				"Processing"
 				);
-		}
+		 }
 	}
 }

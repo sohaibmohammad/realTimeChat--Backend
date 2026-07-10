@@ -4,6 +4,7 @@ using Chat.Business.src.Dto.User.Get;
 using Chat.Business.src.Managers;
 using Chat.Domain.src.Abstraction;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace RealTimeChat.Controllers
 {
@@ -12,6 +13,7 @@ namespace RealTimeChat.Controllers
 	public class AuthController(IAuthService _authService, IUserRepository _userRepository, JwtManager _jwtManager) : ControllerBase
 	{
 		[HttpPost("login")]
+		[EnableRateLimiting("MessageLimiter")]
 
 		public async Task<IActionResult> Login(UserCredentials request)
 		{
