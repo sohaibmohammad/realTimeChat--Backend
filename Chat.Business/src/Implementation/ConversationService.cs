@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.Caching.Distributed;
 namespace Chat.Business.src.Implementation
 {
 	public class ConversationService:IConversationService
@@ -18,8 +18,10 @@ namespace Chat.Business.src.Implementation
 		private readonly IMessageRepository _messageRepository;	
 		private readonly IParticipantRepository _participantRepository;
 		private readonly IUserRepository _userRepository;
-		public ConversationService(IUserRepository userRepository,IMessageRepository messageRepository,IConversationRepository conversationRepository, IParticipantRepository participantRepository	)
+		private readonly IDistributedCache _cache;
+		public ConversationService(IDistributedCache cache,IUserRepository userRepository,IMessageRepository messageRepository,IConversationRepository conversationRepository, IParticipantRepository participantRepository	)
 		{
+			_cache = cache; 
 			_conversationRepository = conversationRepository;
 			_participantRepository = participantRepository;
 			_messageRepository = messageRepository;
@@ -62,6 +64,16 @@ namespace Chat.Business.src.Implementation
 
 		public async Task<List<ConversationGetAll>> GetAllChats(Guid userId)
 		{
+			string cacheKey = $"conversations_{userId}";
+
+			var cachedData = await _cache.GetStringAsync(cacheKey);
+
+			if(!string.IsNullOrEmpty(cachedData))
+			{
+				var cachedConversations = System.Text.Json.JsonSerializer.Deserialize<List<ConversationGetAll>>(cachedData);
+				return cachedConversations ?? new List<ConversationGetAll>();
+			}
+
 			var user = await _userRepository.GetByIdAsync(userId);
 
 			if (user == null)
@@ -88,6 +100,12 @@ namespace Chat.Business.src.Implementation
 					lastMessage?.MessageText ?? string.Empty
 				);
 			}).ToList();
+			var cacheOptions = new DistributedCacheEntryOptions
+			{
+				AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+			};
+
+			await _cache.SetStringAsync(cacheKey, System.Text.Json.JsonSerializer.Serialize(conversationsList), cacheOptions);
 
 			return conversationsList;
 		}

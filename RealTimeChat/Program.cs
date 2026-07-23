@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
-
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. تسجيل الـ Repositories والـ Services (Dependency Injection)
@@ -102,7 +102,12 @@ builder.Services.AddRateLimiter(options => {
 
 });
 
-
+var redisConnectionString=builder.Configuration.GetConnectionString("RedisConnection");
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+	options.Configuration = redisConnectionString;
+}); 
+  
 // 2. تسجيل خدمات الـ SignalR
 builder.Services.AddSignalR();
 
