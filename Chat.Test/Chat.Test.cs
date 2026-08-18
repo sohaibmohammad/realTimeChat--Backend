@@ -65,5 +65,16 @@ namespace Chat.Test
 			_messageRepoMock.Verify(repo => repo.SaveChangesAsync(default), Times.Once);
 
 		}
+		[Fact]
+		public async Task DeleteMessageAsync_ShouldReturnFalse_whenMessageIsNull()
+		{
+			var messageId = Guid.NewGuid();
+			var userId = Guid.NewGuid();
+			_messageRepoMock.Setup(m => m.GetByIdAsync(messageId, default)).ReturnsAsync((Message)null!);
+			var result = await _chatService.DeleteMessageAsync(messageId, userId);
+
+			result.Should().BeFalse();
+			_messageRepoMock.Verify(m => m.DeleteAsync(It.IsAny<Message>()), Times.Never);
+		}
 	}
 }
