@@ -1,60 +1,69 @@
-using Chat.Business.src.Abstraction;
-using Chat.Business.src.Dto.Message.Create;
+Ôªøusing Chat.Business.src.Dto.Message.Create;
 using Chat.Business.src.Hubs;
 using Chat.Business.src.Implementation;
 using Chat.Domain.src.Abstraction;
 using Chat.Domain.src.Entity;
+using FluentAssertions;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
-using System.Threading;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+
 namespace Chat.Test
 {
-	public class ChatServiceTests
-	{
-		//	private readonly Mock<IMessageRepository> _messageRepositoryMock;
-		//	private readonly ChatService _chatService;
-		//			private readonly Mock<IHubContext<ChatHub>> _hubContextMock;
+	 
 
+		public class ChatServiceTests
+		{
+			private readonly Mock<IMessageRepository> _messageRepoMock;
+			private readonly Mock<IConversationRepository> _conversationRepoMock;
+			private readonly Mock<IParticipantRepository> _participantRepoMock;
+			private readonly Mock<IHubContext<ChatHub>> _hubContextMock;
+			private readonly Mock<IHubClients> _hubClientsMock;
+			private readonly Mock<IClientProxy> _clientProxyMock;
 
-		//	public ChatServiceTests()
-		//	{
-		//		// 1. Arrange: ⁄„· Mock ··‹ Repository «·„Œ —ﬁ
-		//		_messageRepositoryMock = new Mock<IMessageRepository>();
+			private readonly ChatService _chatService;
 
-		//		// 2. Õﬁ‰ «·‹ Mock œ«Œ· «·‹ Service «·ÕﬁÌﬁÌ… «··Ì »œ‰« ‰›Õ’Â«
-		//		_chatService = new ChatService(_messageRepositoryMock.Object, _hubContextMock.Object);
-		//	}
-		//	[Fact]
-		//	public async Task SendMessageAsync_ShouldSaveMessageAndReturnCorrectDto()
-		//	{
-		//		var senderId = Guid.NewGuid();
-		//		var receiverId = Guid.NewGuid();
-		//		var content = "Hello, this is a real-time message!";
+			public ChatServiceTests()
+			{
+				_messageRepoMock = new Mock<IMessageRepository>();
+				_conversationRepoMock = new Mock<IConversationRepository>();
+				_participantRepoMock = new Mock<IParticipantRepository>();
+				_hubContextMock = new Mock<IHubContext<ChatHub>>();
+				_hubClientsMock = new Mock<IHubClients>();
+				_clientProxyMock = new Mock<IClientProxy>();
 
-		//		// 1. ≈⁄œ«œ „ÌÀÊœ «·≈÷«›… „⁄  „—Ì— «·‹ CancellationToken «·«› —«÷Ì
-		//		// 1. Õ· „‘ﬂ·… AddAsync: ‰Œ·ÌÂ Ì—Ã⁄ ‰›” «·‹ Message «··Ì œŒ·  ⁄·ÌÂ œÌ‰«„ÌﬂÌ«
-		//		_messageRepositoryMock
-		//			.Setup(repo => repo.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
-		//			.ReturnsAsync((Message msg, CancellationToken token) => msg);
+				// ÿ•ÿπÿØÿßÿØ SignalR Mock ÿπÿ¥ÿßŸÜ ŸÖÿß Ÿäÿ∂ÿ±ÿ® ÿßÿ≥ÿ™ÿ´ŸÜÿßÿ° ŸàŸÇÿ™ ÿßÿ≥ÿ™ÿØÿπÿßÿ° ÿßŸÑŸÄ SendAsync
+				_hubContextMock.Setup(h => h.Clients).Returns(_hubClientsMock.Object);
+				_hubClientsMock.Setup(c => c.Group(It.IsAny<string>())).Returns(_clientProxyMock.Object);
 
-		//		// 2. ≈⁄œ«œ „ÌÀÊœ «·Õ›Ÿ ( √ﬂœ „‰ ﬂ «» Â« Âﬂ–« ≈–« ﬂ«‰   —Ã⁄ Task ›«—€)
-		//		_messageRepositoryMock
-		//			.Setup(repo => repo.SaveChangesAsync(It.IsAny<CancellationToken>()))
-		//			.Returns(Task.CompletedTask);
+				// ÿ•ŸÜÿ¥ÿßÿ° ŸÜÿ≥ÿÆÿ© ŸÖŸÜ ÿßŸÑŸÄ ChatService Ÿàÿ™ŸÖÿ±Ÿäÿ± ÿßŸÑŸÖŸàŸÉÿ≥ ŸÉÿßŸÖŸÑÿ©
+				_chatService = new ChatService(
+					_participantRepoMock.Object,
+					_conversationRepoMock.Object,
+					_messageRepoMock.Object,
+					_hubContextMock.Object
+				);
+			}
 
-		//		var result = await _chatService.SendMessageAsync(new CreateMessageRequest(senderId, receiverId, content));
+			[Fact]
+		public async Task SendMessageAsync_ShouldReturnMessageDto_WhenSuccessfullyAdded()
+		{
+			var senderId = Guid.NewGuid();
 
-		//		Assert.NotNull(result);
-		//		Assert.NotEqual(Guid.Empty, result.Id); // «· √ﬂœ „‰  Ê·Ìœ Guid ÃœÌœ ··—”«·…
-		//		Assert.Equal(senderId, result.SenderId);
-		//		Assert.Equal(receiverId, result.ConversationId);
-		//		Assert.Equal(content, result.MessageText);
-		//		Assert.Equal("Sent", result.Status); // «· √ﬂœ „‰ «·Õ«·… «·√Ê·Ì… ··—”«·…
+			var request = new CreateMessageRequest
+			(Guid.NewGuid(), "Hello, World!");
 
-		//		// «· Õﬁﬁ «·Â‰œ”Ì: Â· «·‹ Service «” œ⁄  „ÌÀÊœ «·Õ›Ÿ »«·‹ Repository ›⁄·« Ê„—… Ê«Õœ…ø
-		//		_messageRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()), Times.Once);
-		//		_messageRepositoryMock.Verify(repo => repo.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-	//}
+			var result =await _chatService.SendMessageAsync(senderId, request);
+			result.Should().NotBeNull();
+			result.MessageText.Should().Be(request.Content);
+			result.SenderId.Should().Be(senderId);
+			_messageRepoMock.Verify(m => m.AddAsync(It.IsAny<Message>(),default), Times.Once);
+			_messageRepoMock.Verify(repo => repo.SaveChangesAsync(default), Times.Once);
+
+		}
 	}
 }
