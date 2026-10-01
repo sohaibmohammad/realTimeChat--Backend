@@ -1,0 +1,30 @@
+services:
+
+  redis:
+    image: redis:latest
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "SohaibSqlPasS2026!"
+    ports:
+      - "1434:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+
+  chat-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=RealTimeChat;User Id=sa;Password=SohaibSqlPasS2026!;TrustServerCertificate=True"
+      ConnectionStrings__RedisConnection: "redis:6379"
+    depends_on:
+      - redis
+      - sqlserver
+
+volumes:
+  sql-data:
