@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /app
+
+# Install Visual Studio debugger
+RUN apt-get update \
+    && apt-get install -y curl unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg
+
+COPY . .
+
+RUN dotnet restore RealTimeChat/RealTimeChat.csproj
+
+EXPOSE 8080
+
+CMD ["dotnet", "watch", "run", "--project", "RealTimeChat/RealTimeChat.csproj", "--urls", "http://0.0.0.0:8080"]

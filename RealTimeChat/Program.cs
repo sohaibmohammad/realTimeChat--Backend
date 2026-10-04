@@ -123,7 +123,6 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 // 🔥 [تعديل 2]: ترتيب الـ Middleware الصحيح
 app.UseCors("AllowReactApp"); // 1. الـ CORS أولاً

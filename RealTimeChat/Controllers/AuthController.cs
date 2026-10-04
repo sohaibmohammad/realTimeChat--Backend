@@ -18,7 +18,8 @@ namespace RealTimeChat.Controllers
 		public async Task<IActionResult> Login(UserCredentials request)
 		{
 			var result = await _authService.AuthenticateUserAsync(request);
-
+            Console.WriteLine(
+				"new login ");
 			return Ok(new { AccessToken = result.AccessToken, RefreshToken = result.RefreshToken });
 		}
 		
